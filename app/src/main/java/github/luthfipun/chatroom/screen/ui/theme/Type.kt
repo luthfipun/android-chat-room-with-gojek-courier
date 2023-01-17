@@ -1,4 +1,4 @@
-package github.luthfipun.chatroom.ui.theme
+package github.luthfipun.chatroom.screen.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
