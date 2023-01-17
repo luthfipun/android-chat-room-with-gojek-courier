@@ -45,7 +45,7 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(20.dp))
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { onNavigateToChat() },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 24.dp),
