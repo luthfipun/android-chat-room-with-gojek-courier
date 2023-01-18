@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,11 +59,11 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
+                    Icon(
                         modifier = Modifier.size(28.dp),
                         painter = painterResource(id = R.drawable.ic_chat),
                         contentDescription = "button_chat_icon",
-                        colorFilter = ColorFilter.tint(Green200)
+                        tint = Green200
                     )
 
                     Spacer(modifier = modifier.width(12.dp))
@@ -75,11 +75,11 @@ fun HomeScreen(
                     )
                 }
 
-                Image(
+                Icon(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(id = R.drawable.ic_arrow_right),
                     contentDescription = "button_chat_icon_arrow",
-                    colorFilter = ColorFilter.tint(Green200)
+                    tint = Green200
                 )
             }
         }

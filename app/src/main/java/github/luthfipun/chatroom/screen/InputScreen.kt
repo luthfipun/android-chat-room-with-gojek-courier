@@ -1,5 +1,6 @@
 package github.luthfipun.chatroom.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -139,23 +140,25 @@ fun InputAvatar() {
         state = rememberLazyGridState()
     ){
         items(avatars.size){
-            IconButton(onClick = { avatarSelected = it }) {
+            IconButton(
+                onClick = { avatarSelected = it },
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
                 Image(
                     painter = painterResource(id = avatars[it]),
                     contentDescription = "person${it}",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .padding(8.dp)
                         .size(72.dp)
                         .border(
-                            width = 3.dp,
-                            color = if (avatarSelected == it) Green500 else Color.LightGray.copy(
-                                0.3f
+                            border = BorderStroke(
+                                width = 3.dp,
+                                color = if (avatarSelected == it) Green500 else Color.LightGray.copy(0.3f)
                             ),
                             shape = CircleShape
                         )
+                        .padding(3.dp)
                         .clip(CircleShape)
-                        .padding(12.dp)
                         .background(color = Color.White)
                 )
             }
@@ -175,11 +178,11 @@ fun InputHeader() {
             onClick = { /*TODO*/ },
             modifier = Modifier.size(48.dp)
         ) {
-            Image(
+            Icon(
                 modifier = Modifier.size(48.dp),
                 painter = painterResource(id = R.drawable.ic_arrow_left),
                 contentDescription = "icon_back",
-                colorFilter = ColorFilter.tint(Green500)
+                tint = Green500
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
