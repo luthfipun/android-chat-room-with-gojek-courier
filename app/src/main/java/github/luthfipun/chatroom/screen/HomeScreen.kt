@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import github.luthfipun.chatroom.R
 import github.luthfipun.chatroom.screen.ui.theme.Green200
+import github.luthfipun.chatroom.screen.ui.theme.Green500
 
 @Preview(showBackground = true)
 @Composable
@@ -38,10 +39,12 @@ fun HomeScreen(
             contentDescription = "logo",
             modifier = Modifier.size(50.dp)
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(id = R.string.app_name),
             fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Green500
         )
         Spacer(modifier = Modifier.height(20.dp))
         Button(
