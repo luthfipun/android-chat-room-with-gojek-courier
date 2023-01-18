@@ -25,13 +25,15 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController = navController, startDestination = "home"){
                         composable("home"){
-                            HomeScreen(onNavigateToChat = {
+                            HomeScreen(onNavigateToInput = {
                                 navController.navigate("input")
                             })
                         }
 
                         composable("input"){
-                            InputScreen()
+                            InputScreen(onNavigateToChat = {
+                                navController.navigate("chat")
+                            })
                         }
 
                         composable("chat"){

@@ -24,7 +24,7 @@ import github.luthfipun.chatroom.screen.ui.theme.Green200
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onNavigateToChat: () -> Unit = {}
+    onNavigateToInput: () -> Unit = {}
 ){
     Column(
         modifier = modifier
@@ -45,7 +45,7 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(20.dp))
         Button(
-            onClick = { onNavigateToChat() },
+            onClick = { onNavigateToInput() },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 24.dp),

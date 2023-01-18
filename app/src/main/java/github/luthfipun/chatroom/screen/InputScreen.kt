@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,7 +35,8 @@ import github.luthfipun.chatroom.screen.ui.theme.Green500
 @Preview(showBackground = true)
 @Composable
 fun InputScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToChat: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -41,14 +44,16 @@ fun InputScreen(
         InputHeader()
         InputAvatar()
         InputName()
-        InputSubmit()
+        InputSubmit(onNavigateToChat = onNavigateToChat)
     }
 }
 
 @Composable
-fun InputSubmit() {
+fun InputSubmit(
+    onNavigateToChat: () -> Unit
+) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = { onNavigateToChat() },
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 24.dp, end = 24.dp, top = 24.dp),
@@ -86,6 +91,7 @@ fun InputSubmit() {
 fun InputName() {
 
     var nameFields by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
 
     OutlinedTextField(
         value = nameFields,
@@ -104,6 +110,9 @@ fun InputName() {
             )
         },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = {
+            focusManager.clearFocus(true)
+        }),
         shape = RoundedCornerShape(8.dp),
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Green500,
