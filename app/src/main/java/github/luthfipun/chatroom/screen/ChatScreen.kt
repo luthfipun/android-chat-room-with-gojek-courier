@@ -1,5 +1,6 @@
 package github.luthfipun.chatroom.screen
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +31,10 @@ import github.luthfipun.chatroom.screen.ui.theme.Green200
 import github.luthfipun.chatroom.screen.ui.theme.Green500
 
 @Preview(showBackground = true)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+    showBackground = true, backgroundColor = 0xFF040404
+)
 @Composable
 fun ChatScreen(
     modifier: Modifier = Modifier
@@ -58,7 +63,8 @@ fun ChatHeader() {
                 Text(
                     text = "Chat Room",
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colors.onPrimary
                 )
                 Text(
                     text = "someone typing...",
@@ -74,7 +80,8 @@ fun ChatHeader() {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_left),
                     contentDescription = "back_icon",
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colors.onPrimary
                 )
             }
         },
@@ -82,11 +89,12 @@ fun ChatHeader() {
             IconButton(onClick = { /*TODO*/ }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_more),
-                    contentDescription = "more_icon"
+                    contentDescription = "more_icon",
+                    tint = MaterialTheme.colors.onPrimary
                 )
             }
         },
-        backgroundColor = Color.White,
+        backgroundColor = MaterialTheme.colors.background,
         elevation = 8.dp
     )
 }

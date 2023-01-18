@@ -1,13 +1,11 @@
 package github.luthfipun.chatroom.screen
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +19,12 @@ import github.luthfipun.chatroom.R
 import github.luthfipun.chatroom.screen.ui.theme.Green200
 import github.luthfipun.chatroom.screen.ui.theme.Green500
 
-@Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL,
+    showBackground = true
+)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+    showBackground = true, backgroundColor = 0xFF000000
+)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -74,7 +77,8 @@ fun HomeScreen(
                     Text(
                         text = "Join Room",
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colors.onPrimary
                     )
                 }
 

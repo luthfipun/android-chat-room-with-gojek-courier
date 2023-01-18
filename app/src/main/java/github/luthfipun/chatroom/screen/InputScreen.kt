@@ -1,5 +1,6 @@
 package github.luthfipun.chatroom.screen
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,6 +34,9 @@ import github.luthfipun.chatroom.screen.ui.theme.Green200
 import github.luthfipun.chatroom.screen.ui.theme.Green500
 
 @Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+    showBackground = true, backgroundColor = 0xFF000000
+)
 @Composable
 fun InputScreen(
     modifier: Modifier = Modifier,
@@ -130,7 +134,7 @@ fun InputName() {
 @Composable
 fun InputAvatar() {
 
-    val avatars = listOf<Int>(
+    val avatars = listOf(
         R.drawable.person1,
         R.drawable.person2,
         R.drawable.person3,
@@ -198,7 +202,8 @@ fun InputHeader() {
         Text(
             text = "Pick Avatar and Your Name",
             fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colors.onPrimary
         )
     }
 }
