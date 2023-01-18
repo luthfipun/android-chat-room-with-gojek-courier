@@ -146,12 +146,7 @@ fun ChatBody(isMe: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(
-                top = 8.dp,
-                bottom = 8.dp,
-                start = 8.dp,
-                end = 8.dp
-            ),
+            .padding(8.dp),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
     ) {
@@ -176,8 +171,43 @@ fun ChatContent(
         userScrollEnabled = true
     ) {
         items(10){
-            ChatBody(it % 2 == 0)
+            if (it == 5){
+                ChatInfo()
+            }else {
+                ChatBody(it % 2 == 0)
+            }
         }
+    }
+}
+
+@Composable
+fun ChatInfo() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Today",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.Gray.copy(0.8f),
+            modifier = Modifier
+                .clip(
+                    RoundedCornerShape(4.dp)
+                )
+                .background(Color.LightGray.copy(0.5f))
+                .padding(horizontal = 12.dp, vertical = 1.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Naruto joined the Room",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal,
+            color = Color.LightGray
+        )
     }
 }
 
