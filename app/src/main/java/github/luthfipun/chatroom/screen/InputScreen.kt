@@ -39,7 +39,8 @@ import github.luthfipun.chatroom.screen.ui.theme.Green500
 @Composable
 fun InputScreen(
     modifier: Modifier = Modifier,
-    onNavigateToChat: () -> Unit = {}
+    onNavigateToChat: () -> Unit = {},
+    onNavigateBack: () -> Unit = {}
 ) {
     var avatarSelected by remember { mutableStateOf(-1) }
     var nameField by remember { mutableStateOf("") }
@@ -52,7 +53,9 @@ fun InputScreen(
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
-        InputHeader()
+        InputHeader(onBack = {
+            onNavigateBack()
+        })
         InputAvatar(
             avatarSelected = avatarSelected,
             onAvatarSelected = {
@@ -267,7 +270,9 @@ fun InputAvatarItem(
 }
 
 @Composable
-fun InputHeader() {
+fun InputHeader(
+    onBack:() -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -275,7 +280,7 @@ fun InputHeader() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = { onBack() },
             modifier = Modifier.size(48.dp)
         ) {
             Icon(

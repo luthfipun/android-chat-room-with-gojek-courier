@@ -2,6 +2,7 @@
 
 package github.luthfipun.chatroom.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,9 +39,10 @@ import github.luthfipun.chatroom.screen.ui.theme.Green500
 @Preview(showBackground = true)
 @Composable
 fun ChatScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit = {}
 ){
-
+    var leaveDialogStatus by remember { mutableStateOf(false) }
     var messageInput by remember { mutableStateOf("") }
     val fakeMessages = remember { mutableStateListOf<Message>() }
     val fakeUser = UserInfo(
@@ -49,12 +51,16 @@ fun ChatScreen(
         name = "John Doe"
     )
 
-    Column(
+    BackHandler {
+        leaveDialogStatus = true
+    }
+
+    Box(
         modifier = modifier.fillMaxSize(),
     ){
         Column(modifier = Modifier
             .fillMaxWidth()) {
-            ChatHeader()
+            ChatHeader(onBack = { leaveDialogStatus = true })
             ChatContent(
                 modifier = Modifier.weight(1f),
                 messages = messageBodyType(fakeMessages).reversed()
@@ -81,11 +87,23 @@ fun ChatScreen(
                 }
             )
         }
+        LeaveDialog(
+            leaveDialogStatus = leaveDialogStatus,
+            onLeaveDialogConfirm = {
+                leaveDialogStatus = false
+                onNavigateBack()
+            },
+            onLeaveDialogDismiss = {
+                leaveDialogStatus = false
+            }
+        )
     }
 }
 
 @Composable
-fun ChatHeader() {
+fun ChatHeader(
+    onBack: () -> Unit
+) {
     TopAppBar(
         title = {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -105,7 +123,7 @@ fun ChatHeader() {
         },
         modifier = Modifier.height(65.dp),
         navigationIcon = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { onBack() }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_left),
                     contentDescription = "back_icon",
@@ -181,6 +199,7 @@ fun ChatInput(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatContent(
     modifier: Modifier = Modifier,
@@ -335,5 +354,77 @@ fun ChatMessage(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun LeaveDialog(
+    leaveDialogStatus: Boolean,
+    onLeaveDialogDismiss: () -> Unit,
+    onLeaveDialogConfirm: () -> Unit
+) {
+    if (leaveDialogStatus){
+        AlertDialog(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            onDismissRequest = { onLeaveDialogDismiss() },
+            shape = RoundedCornerShape(8.dp),
+            backgroundColor = MaterialTheme.colors.background,
+            title = {
+                Text(
+                    text = "Leave Room",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colors.onPrimary
+                )
+            },
+            text = {
+                Text(
+                    text = "Are you sure to leave the chat room?",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Gray
+                )
+            },
+            buttons = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Button(
+                        onClick = { onLeaveDialogDismiss() },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.LightGray
+                        )
+                    ) {
+                        Text(
+                            text = "Cancel",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.Black
+                        )
+                    }
+                    Button(
+                        onClick = { onLeaveDialogConfirm() },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Green200
+                        )
+                    ) {
+                        Text(
+                            text = "Yes, Leave Room",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.Black
+                        )
+                    }
+                }
+            }
+        )
     }
 }

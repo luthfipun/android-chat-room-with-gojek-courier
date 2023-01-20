@@ -31,13 +31,22 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("input"){
-                            InputScreen(onNavigateToChat = {
-                                navController.navigate("chat")
-                            })
+                            InputScreen(
+                                onNavigateToChat = {
+                                    navController.navigate("chat"){
+                                        popUpTo("home")
+                                    }
+                                },
+                                onNavigateBack = {
+                                    navController.popBackStack()
+                                }
+                            )
                         }
 
                         composable("chat"){
-                            ChatScreen()
+                            ChatScreen(onNavigateBack = {
+                                navController.popBackStack()
+                            })
                         }
                     }
                 }
