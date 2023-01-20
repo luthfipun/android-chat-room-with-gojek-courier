@@ -1,12 +1,11 @@
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
+
 package github.luthfipun.chatroom.screen
 
-import android.content.res.Configuration
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +15,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -27,31 +27,60 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import github.luthfipun.chatroom.R
+import github.luthfipun.chatroom.domain.data.Message
+import github.luthfipun.chatroom.domain.data.UserInfo
+import github.luthfipun.chatroom.domain.util.MessageInfoType
+import github.luthfipun.chatroom.domain.util.MessageType
+import github.luthfipun.chatroom.domain.util.messageBodyType
 import github.luthfipun.chatroom.screen.ui.theme.Green200
 import github.luthfipun.chatroom.screen.ui.theme.Green500
 
 @Preview(showBackground = true)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
-    showBackground = true, backgroundColor = 0xFF040404
-)
 @Composable
 fun ChatScreen(
     modifier: Modifier = Modifier
 ){
+
+    var messageInput by remember { mutableStateOf("") }
+    val fakeMessages = remember { mutableStateListOf<Message>() }
+    val fakeUser = UserInfo(
+        id = 1L,
+        avatar = R.drawable.person2,
+        name = "John Doe"
+    )
+
     Column(
         modifier = modifier.fillMaxSize(),
     ){
-
         Column(modifier = Modifier
             .fillMaxWidth()) {
             ChatHeader()
             ChatContent(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                messages = messageBodyType(fakeMessages).reversed()
             )
-            ChatInput()
+            ChatInput(
+                messageInput = messageInput,
+                onMessageChange = {
+                    messageInput = it
+                },
+                onSend = {
+                    if (messageInput.isNotBlank()){
+                        val message = Message(
+                            id = System.currentTimeMillis(),
+                            text = messageInput,
+                            type = MessageType.TEXT,
+                            time = "19:00",
+                            user = fakeUser,
+                            infoType = null,
+                            isOwner = true
+                        )
+                        fakeMessages.add(message)
+                        messageInput = ""
+                    }
+                }
+            )
         }
-
     }
 }
 
@@ -100,14 +129,17 @@ fun ChatHeader() {
 }
 
 @Composable
-fun ChatInput() {
+fun ChatInput(
+    messageInput: String,
+    onMessageChange: (value: String) -> Unit,
+    onSend: () -> Unit
+) {
 
-    var messageInput by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
 
     OutlinedTextField(
         value = messageInput,
-        onValueChange = { messageInput = it },
+        onValueChange = { onMessageChange(it) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
@@ -136,7 +168,7 @@ fun ChatInput() {
         },
         trailingIcon = {
             IconButton(
-                onClick = { /*TODO*/ }
+                onClick = { onSend() }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_send),
@@ -150,27 +182,9 @@ fun ChatInput() {
 }
 
 @Composable
-fun ChatBody(isMe: Boolean) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        verticalAlignment = Alignment.Top,
-        horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
-    ) {
-        if (!isMe){
-            ChatAvatar()
-            ChatMessage(isMe = isMe)
-        }else {
-            ChatMessage(isMe = isMe)
-            ChatAvatar()
-        }
-    }
-}
-
-@Composable
 fun ChatContent(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    messages: List<Message>
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -178,27 +192,60 @@ fun ChatContent(
         reverseLayout = true,
         userScrollEnabled = true
     ) {
-        items(10){
-            if (it == 5){
-                ChatInfo()
-            }else {
-                ChatBody(it % 2 == 0)
+        items(messages, key = { it.id }){ message ->
+            when(message.type){
+                MessageType.TEXT -> ChatBody(modifier = Modifier.animateItemPlacement(), message = message)
+                MessageType.INFO -> ChatInfo(modifier = Modifier.animateItemPlacement(), message = message)
             }
         }
     }
 }
 
 @Composable
-fun ChatInfo() {
+fun ChatBody(
+    modifier: Modifier = Modifier,
+    message: Message
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 8.dp, end = 8.dp, bottom = if (message.isParent) 24.dp else 8.dp),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = if (message.isOwner) Arrangement.End else Arrangement.Start
+    ) {
+        if (!message.isOwner){
+            ChatAvatar(message = message)
+            ChatMessage(message = message)
+        }else {
+            ChatMessage(message = message)
+            ChatAvatar(message = message)
+        }
+    }
+}
+
+@Composable
+fun ChatInfo(
+    modifier: Modifier = Modifier,
+    message: Message
+) {
+    val statusInfo = when(message.type){
+        MessageType.TEXT -> "Unknown"
+        MessageType.INFO -> when (message.infoType){
+            MessageInfoType.JOIN -> "joined"
+            MessageInfoType.LEAVE -> "leave"
+            else -> "Unknown"
+        }
+    }
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Today",
+            text = message.time,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = Color.Gray.copy(0.8f),
@@ -211,7 +258,7 @@ fun ChatInfo() {
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "Naruto joined the Room",
+            text = "${message.user.name} $statusInfo the Room",
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
             color = Color.LightGray
@@ -220,11 +267,14 @@ fun ChatInfo() {
 }
 
 @Composable
-fun ChatAvatar() {
+fun ChatAvatar(
+    message: Message
+) {
     Image(
-        painter = painterResource(id = R.drawable.person1),
+        painter = painterResource(id = message.user.avatar),
         contentDescription = null,
         modifier = Modifier
+            .alpha(if (message.isParent) 1f else 0f)
             .size(40.dp)
             .border(
                 border = BorderStroke(2.dp, Color.LightGray),
@@ -237,14 +287,15 @@ fun ChatAvatar() {
 }
 
 @Composable
-fun ChatMessage(isMe: Boolean) {
+fun ChatMessage(
+    message: Message
+) {
     Column(modifier = Modifier.padding(
-        top = 3.dp,
-        start = if (isMe) 0.dp else 8.dp,
-        end = if (isMe) 8.dp else 0.dp
+        start = if (message.isOwner) 0.dp else 8.dp,
+        end = if (message.isOwner) 8.dp else 0.dp
     )) {
         Text(
-            text = "Hello",
+            text = message.text ?: "",
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
             lineHeight = 21.sp,
@@ -254,31 +305,35 @@ fun ChatMessage(isMe: Boolean) {
                 .widthIn(max = 250.dp)
                 .clip(
                     RoundedCornerShape(
-                        topStart = if (isMe) 8.dp else 0.dp,
-                        topEnd = if (isMe) 0.dp else 8.dp,
+                        topStart = if (message.isOwner) 8.dp else if (message.isParent) 0.dp else 8.dp,
+                        topEnd = if (message.isOwner) if (message.isParent) 0.dp else 8.dp else 8.dp,
                         bottomEnd = 8.dp,
                         bottomStart = 8.dp
                     )
                 )
-                .background(if (isMe) Green500 else Color.Gray)
+                .background(if (message.isOwner) Green500 else Color.Gray)
                 .padding(16.dp)
+                .align(if (message.isOwner) Alignment.End else Alignment.Start)
         )
-        Row(
-            modifier = Modifier.align(if (isMe) Alignment.End else Alignment.Start),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Hannah",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Gray
-            )
-            Text(
-                text = " - 9:00",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Gray
-            )
+
+        if (message.isParent){
+            Row(
+                modifier = Modifier.align(if (message.isOwner) Alignment.End else Alignment.Start),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = message.user.name,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Gray
+                )
+                Text(
+                    text = " - ${message.time}",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Gray
+                )
+            }
         }
     }
 }

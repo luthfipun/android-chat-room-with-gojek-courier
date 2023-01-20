@@ -1,12 +1,12 @@
 package github.luthfipun.chatroom.screen
 
-import android.content.res.Configuration
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -19,17 +19,28 @@ import github.luthfipun.chatroom.R
 import github.luthfipun.chatroom.screen.ui.theme.Green200
 import github.luthfipun.chatroom.screen.ui.theme.Green500
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL,
-    showBackground = true
-)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
-    showBackground = true, backgroundColor = 0xFF000000
-)
+@Preview(showBackground = true)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onNavigateToInput: () -> Unit = {}
 ){
+    var animate by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = Unit){
+        animate = true
+    }
+
+    val animateArrow by animateDpAsState(
+        targetValue = if (animate) 0.dp else 2.dp,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 500,
+                delayMillis = 200
+            ),
+            repeatMode = RepeatMode.Restart
+        )
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -83,7 +94,9 @@ fun HomeScreen(
                 }
 
                 Icon(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .absoluteOffset(x = animateArrow),
                     painter = painterResource(id = R.drawable.ic_arrow_right),
                     contentDescription = "button_chat_icon_arrow",
                     tint = Green200
