@@ -24,32 +24,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import github.luthfipun.chatroom.R
 import github.luthfipun.chatroom.domain.data.Message
-import github.luthfipun.chatroom.domain.data.UserInfo
 import github.luthfipun.chatroom.domain.util.MessageInfoType
 import github.luthfipun.chatroom.domain.util.MessageType
 import github.luthfipun.chatroom.domain.util.messageBodyType
 import github.luthfipun.chatroom.screen.ui.theme.Green200
 import github.luthfipun.chatroom.screen.ui.theme.Green500
 
-@Preview(showBackground = true)
 @Composable
 fun ChatScreen(
     modifier: Modifier = Modifier,
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    viewModel: MainViewModel
 ){
     var leaveDialogStatus by remember { mutableStateOf(false) }
     var messageInput by remember { mutableStateOf("") }
     val fakeMessages = remember { mutableStateListOf<Message>() }
-    val fakeUser = UserInfo(
-        id = 1L,
-        avatar = R.drawable.person2,
-        name = "John Doe"
-    )
+    val fakeUser = viewModel.localUser.collectAsState()
 
     BackHandler {
         leaveDialogStatus = true
@@ -77,7 +71,7 @@ fun ChatScreen(
                             text = messageInput,
                             type = MessageType.TEXT,
                             time = "19:00",
-                            user = fakeUser,
+                            user = fakeUser.value!!,
                             infoType = null,
                             isOwner = true
                         )

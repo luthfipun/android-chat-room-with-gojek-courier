@@ -28,19 +28,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import github.luthfipun.chatroom.R
+import github.luthfipun.chatroom.domain.data.UserInfo
 import github.luthfipun.chatroom.screen.ui.theme.Green200
 import github.luthfipun.chatroom.screen.ui.theme.Green500
 
-@Preview(showBackground = true)
 @Composable
 fun InputScreen(
     modifier: Modifier = Modifier,
     onNavigateToChat: () -> Unit = {},
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    viewModel: MainViewModel
 ) {
     var avatarSelected by remember { mutableStateOf(-1) }
     var nameField by remember { mutableStateOf("") }
@@ -51,7 +51,7 @@ fun InputScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         InputHeader(onBack = {
             onNavigateBack()
@@ -69,7 +69,15 @@ fun InputScreen(
             }
         )
         InputSubmit(
-            onNavigateToChat = onNavigateToChat,
+            onNavigateToChat = {
+                val localUser = UserInfo(
+                    id = System.currentTimeMillis(),
+                    name = nameField,
+                    avatar = avatarSelected
+                )
+                viewModel.setLocalUser(localUser)
+                onNavigateToChat()
+            },
             isReady = isReady
         )
     }
