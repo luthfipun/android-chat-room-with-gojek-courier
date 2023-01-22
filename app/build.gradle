@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -64,4 +66,21 @@ dependencies {
 
     def nav_version = "2.5.3"
     implementation "androidx.navigation:navigation-compose:$nav_version"
+
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha04"
+
+    def gojek_courier_version = "0.1.6"
+    implementation "com.gojek.courier:courier:$gojek_courier_version"
+    implementation "com.gojek.courier:courier-message-adapter-gson:$gojek_courier_version"
+    implementation "com.gojek.courier:courier-stream-adapter-coroutines:$gojek_courier_version"
+}
+
+kapt {
+    correctErrorTypes true
 }
