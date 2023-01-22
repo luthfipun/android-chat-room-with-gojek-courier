@@ -79,6 +79,7 @@ dependencies {
     implementation "com.gojek.courier:courier:$gojek_courier_version"
     implementation "com.gojek.courier:courier-message-adapter-gson:$gojek_courier_version"
     implementation "com.gojek.courier:courier-stream-adapter-coroutines:$gojek_courier_version"
+    implementation "com.gojek.courier:workmanager-2.6.0-pingsender:$gojek_courier_version"
 }
 
 kapt {

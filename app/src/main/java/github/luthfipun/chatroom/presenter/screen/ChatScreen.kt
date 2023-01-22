@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 
-package github.luthfipun.chatroom.screen
+package github.luthfipun.chatroom.presenter.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
@@ -30,9 +30,8 @@ import github.luthfipun.chatroom.R
 import github.luthfipun.chatroom.domain.data.Message
 import github.luthfipun.chatroom.domain.util.MessageInfoType
 import github.luthfipun.chatroom.domain.util.MessageType
-import github.luthfipun.chatroom.domain.util.messageBodyType
-import github.luthfipun.chatroom.screen.ui.theme.Green200
-import github.luthfipun.chatroom.screen.ui.theme.Green500
+import github.luthfipun.chatroom.presenter.screen.ui.theme.Green200
+import github.luthfipun.chatroom.presenter.screen.ui.theme.Green500
 
 @Composable
 fun ChatScreen(
@@ -42,8 +41,11 @@ fun ChatScreen(
 ){
     var leaveDialogStatus by remember { mutableStateOf(false) }
     var messageInput by remember { mutableStateOf("") }
-    val fakeMessages = remember { mutableStateListOf<Message>() }
-    val fakeUser = viewModel.localUser.collectAsState()
+    val messages = viewModel.localMessage.collectAsState()
+
+    LaunchedEffect(key1 = Unit){
+        viewModel.joinOrLeaveRoom(MessageInfoType.JOIN)
+    }
 
     BackHandler {
         leaveDialogStatus = true
@@ -57,7 +59,7 @@ fun ChatScreen(
             ChatHeader(onBack = { leaveDialogStatus = true })
             ChatContent(
                 modifier = Modifier.weight(1f),
-                messages = messageBodyType(fakeMessages).reversed()
+                messages = messages.value.reversed()
             )
             ChatInput(
                 messageInput = messageInput,
@@ -66,16 +68,7 @@ fun ChatScreen(
                 },
                 onSend = {
                     if (messageInput.isNotBlank()){
-                        val message = Message(
-                            id = System.currentTimeMillis(),
-                            text = messageInput,
-                            type = MessageType.TEXT,
-                            time = "19:00",
-                            user = fakeUser.value!!,
-                            infoType = null,
-                            isOwner = true
-                        )
-                        fakeMessages.add(message)
+                        viewModel.sendMessage(messageInput)
                         messageInput = ""
                     }
                 }
@@ -84,6 +77,10 @@ fun ChatScreen(
         LeaveDialog(
             leaveDialogStatus = leaveDialogStatus,
             onLeaveDialogConfirm = {
+                viewModel.joinOrLeaveRoom(MessageInfoType.LEAVE)
+                viewModel.clearMessage()
+                viewModel.clearUser()
+                viewModel.unsubscribe()
                 leaveDialogStatus = false
                 onNavigateBack()
             },
@@ -199,13 +196,20 @@ fun ChatContent(
     modifier: Modifier = Modifier,
     messages: List<Message>
 ) {
+
+    val scrollState = rememberLazyListState()
+
+    LaunchedEffect(key1 = messages.size){
+        scrollState.animateScrollToItem(0)
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
-        state = rememberLazyListState(),
+        state = scrollState,
         reverseLayout = true,
         userScrollEnabled = true
     ) {
-        items(messages, key = { it.id }){ message ->
+        items(messages){ message ->
             when(message.type){
                 MessageType.TEXT -> ChatBody(modifier = Modifier.animateItemPlacement(), message = message)
                 MessageType.INFO -> ChatInfo(modifier = Modifier.animateItemPlacement(), message = message)

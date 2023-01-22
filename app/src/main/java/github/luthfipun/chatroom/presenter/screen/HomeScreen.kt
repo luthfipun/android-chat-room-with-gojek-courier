@@ -1,4 +1,4 @@
-package github.luthfipun.chatroom.screen
+package github.luthfipun.chatroom.presenter.screen
 
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
@@ -15,21 +15,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import github.luthfipun.chatroom.R
-import github.luthfipun.chatroom.screen.ui.theme.Green200
-import github.luthfipun.chatroom.screen.ui.theme.Green500
+import github.luthfipun.chatroom.presenter.screen.ui.theme.Green200
+import github.luthfipun.chatroom.presenter.screen.ui.theme.Green500
 
-@Preview(showBackground = true)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onNavigateToInput: () -> Unit = {}
+    onNavigateToInput: () -> Unit = {},
+    viewModel: MainViewModel
 ){
     var animate by remember { mutableStateOf(false) }
     LaunchedEffect(key1 = Unit){
+        viewModel.connect()
         animate = true
     }
 

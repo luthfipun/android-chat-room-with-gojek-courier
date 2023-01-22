@@ -1,4 +1,4 @@
-package github.luthfipun.chatroom.screen
+package github.luthfipun.chatroom.presenter.screen
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import github.luthfipun.chatroom.R
 import github.luthfipun.chatroom.domain.data.UserInfo
-import github.luthfipun.chatroom.screen.ui.theme.Green200
-import github.luthfipun.chatroom.screen.ui.theme.Green500
+import github.luthfipun.chatroom.presenter.screen.ui.theme.Green200
+import github.luthfipun.chatroom.presenter.screen.ui.theme.Green500
 
 @Composable
 fun InputScreen(
@@ -76,6 +76,7 @@ fun InputScreen(
                     avatar = avatarSelected
                 )
                 viewModel.setLocalUser(localUser)
+                viewModel.subscribe()
                 onNavigateToChat()
             },
             isReady = isReady

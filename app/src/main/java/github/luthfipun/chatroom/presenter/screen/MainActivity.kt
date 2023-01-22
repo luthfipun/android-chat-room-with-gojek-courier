@@ -1,4 +1,4 @@
-package github.luthfipun.chatroom.screen
+package github.luthfipun.chatroom.presenter.screen
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import github.luthfipun.chatroom.screen.ui.theme.ChatRoomTheme
+import github.luthfipun.chatroom.presenter.screen.ui.theme.ChatRoomTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -31,9 +31,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController = navController, startDestination = "home"){
                         composable("home"){
-                            HomeScreen(onNavigateToInput = {
-                                navController.navigate("input")
-                            })
+                            HomeScreen(
+                                onNavigateToInput = {
+                                    navController.navigate("input")
+                                },
+                                viewModel = mainViewModel
+                            )
                         }
 
                         composable("input"){
