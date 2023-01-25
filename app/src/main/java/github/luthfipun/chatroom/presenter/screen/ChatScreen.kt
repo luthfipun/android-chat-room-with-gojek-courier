@@ -2,8 +2,8 @@
 
 package github.luthfipun.chatroom.presenter.screen
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -199,7 +200,6 @@ fun ChatContent(
 
     LaunchedEffect(key1 = messages.size){
         scrollState.animateScrollToItem(0)
-        Log.d("ENOG", "ChatContent: ${messages.size}")
     }
 
     LazyColumn(
@@ -306,10 +306,16 @@ fun ChatAvatar(
 fun ChatMessage(
     message: Message
 ) {
-    Column(modifier = Modifier.padding(
-        start = if (message.isOwner) 0.dp else 8.dp,
-        end = if (message.isOwner) 8.dp else 0.dp
-    )) {
+
+    var timeVisible by remember { mutableStateOf(message.isParent) }
+    val density = LocalDensity.current
+
+    Column(
+        modifier = Modifier.padding(
+            start = if (message.isOwner) 0.dp else 8.dp,
+            end = if (message.isOwner) 8.dp else 0.dp,
+        )
+    ) {
         Text(
             text = message.text ?: "",
             fontSize = 16.sp,
@@ -319,6 +325,11 @@ fun ChatMessage(
             color = Color.White,
             modifier = Modifier
                 .widthIn(max = 250.dp)
+                .clickable {
+                    if (!message.isParent){
+                        timeVisible = !timeVisible
+                    }
+                }
                 .clip(
                     RoundedCornerShape(
                         topStart = if (message.isOwner) 8.dp else if (message.isParent) 0.dp else 8.dp,
@@ -332,19 +343,27 @@ fun ChatMessage(
                 .align(if (message.isOwner) Alignment.End else Alignment.Start)
         )
 
-        if (message.isParent){
-            Row(
-                modifier = Modifier.align(if (message.isOwner) Alignment.End else Alignment.Start),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        Row(
+            modifier = Modifier.align(if (message.isOwner) Alignment.End else Alignment.Start),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (message.isParent){
                 Text(
-                    text = message.user.name,
+                    text = "${message.user.name} - ",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal,
                     color = Color.Gray
                 )
+            }
+            AnimatedVisibility(
+                visible = timeVisible,
+                enter = slideInVertically {
+                    with(density) { -20.dp.roundToPx() }
+                } + expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
+                exit = slideOutVertically() + shrinkVertically() + fadeOut()
+            ) {
                 Text(
-                    text = " - ${message.time}",
+                    text = message.time,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal,
                     color = Color.Gray

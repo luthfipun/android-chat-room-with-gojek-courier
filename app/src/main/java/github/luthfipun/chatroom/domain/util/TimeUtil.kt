@@ -9,6 +9,6 @@ fun Context.formatMessageTime(time: Long): String {
 
 fun Context.formatMessageInfo(time: Long): String {
     return if (DateUtils.isToday(time)){
-        DateUtils.getRelativeTimeSpanString(time).toString()
+        DateUtils.formatDateTime(this, time, DateUtils.FORMAT_SHOW_TIME)
     }else DateUtils.formatDateTime(this, time, DateUtils.FORMAT_SHOW_WEEKDAY)
 }
