@@ -2,6 +2,7 @@
 
 package github.luthfipun.chatroom.presenter.screen
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -78,9 +79,6 @@ fun ChatScreen(
             leaveDialogStatus = leaveDialogStatus,
             onLeaveDialogConfirm = {
                 viewModel.joinOrLeaveRoom(MessageInfoType.LEAVE)
-                viewModel.clearMessage()
-                viewModel.clearUser()
-                viewModel.unsubscribe()
                 leaveDialogStatus = false
                 onNavigateBack()
             },
@@ -201,6 +199,7 @@ fun ChatContent(
 
     LaunchedEffect(key1 = messages.size){
         scrollState.animateScrollToItem(0)
+        Log.d("ENOG", "ChatContent: ${messages.size}")
     }
 
     LazyColumn(

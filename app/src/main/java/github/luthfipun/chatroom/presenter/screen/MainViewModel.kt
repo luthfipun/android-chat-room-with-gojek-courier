@@ -23,10 +23,15 @@ class MainViewModel @Inject constructor(
     private val mainRepository: MainRepository
 ): ViewModel() {
 
-    private val _localUser = MutableStateFlow<UserInfo?>(null)
-    private val localUser = _localUser.asStateFlow()
+    init {
+        connect()
+        subscribe()
+    }
 
-    private val _localMessage = MutableStateFlow<List<Message>>(listOf())
+    private val _localUser = MutableStateFlow<UserInfo?>(null)
+    val localUser = _localUser.asStateFlow()
+
+    private val _localMessage = MutableStateFlow<List<Message>>(emptyList())
     val localMessage = _localMessage.asStateFlow()
 
     private val avatars = listOf(
@@ -61,12 +66,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun unsubscribe(){
-        viewModelScope.launch {
-            mainRepository.unsubscribe()
-        }
-    }
-
     fun sendMessage(message: String){
         val messageData = MessageData(
             text = message,
@@ -89,19 +88,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun clearMessage(){
+    fun clearState(){
         viewModelScope.launch {
-            _localMessage.emit(listOf())
-        }
-    }
-
-    fun clearUser(){
-        viewModelScope.launch {
+            _localMessage.emit(emptyList())
             _localUser.emit(null)
         }
     }
 
-    fun connect(){
+    private fun connect(){
         viewModelScope.launch {
             mainRepository.connect()
         }

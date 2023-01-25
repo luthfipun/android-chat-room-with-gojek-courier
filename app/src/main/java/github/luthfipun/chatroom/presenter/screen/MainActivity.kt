@@ -42,9 +42,7 @@ class MainActivity : ComponentActivity() {
                         composable("input"){
                             InputScreen(
                                 onNavigateToChat = {
-                                    navController.navigate("chat"){
-                                        popUpTo("home")
-                                    }
+                                    navController.navigate("chat")
                                 },
                                 onNavigateBack = {
                                     navController.popBackStack()
@@ -56,7 +54,10 @@ class MainActivity : ComponentActivity() {
                         composable("chat"){
                             ChatScreen(
                                 onNavigateBack = {
-                                    navController.popBackStack()
+                                    navController.navigate("home"){
+                                        popUpTo("chat")
+                                        restoreState = false
+                                    }
                                 },
                                 viewModel = mainViewModel
                             )

@@ -24,10 +24,11 @@ class MainRepositoryImpl @Inject constructor(
     }
 
     override suspend fun disconnect() {
-        mqttClient.disconnect()
+        mqttClient.disconnect(clearState = true)
     }
 
-    override suspend fun subscribe(topic: String): Flow<Message> = mqttService.subscribe(topic = topic).map { it.toMessage(context) }
+    override suspend fun subscribe(topic: String): Flow<Message> =
+        mqttService.subscribe(topic = topic).map { it.toMessage(context) }
 
     override suspend fun unsubscribe(topic: String) {
         mqttService.unsubscribe(topic = topic)

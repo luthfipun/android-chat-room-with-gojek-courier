@@ -28,8 +28,12 @@ fun HomeScreen(
     viewModel: MainViewModel
 ){
     var animate by remember { mutableStateOf(false) }
+    val localUser = viewModel.localUser.collectAsState()
+
     LaunchedEffect(key1 = Unit){
-        viewModel.connect()
+        if (localUser.value != null){
+            viewModel.clearState()
+        }
         animate = true
     }
 

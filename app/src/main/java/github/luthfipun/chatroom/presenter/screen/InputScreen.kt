@@ -76,7 +76,6 @@ fun InputScreen(
                     avatar = avatarSelected
                 )
                 viewModel.setLocalUser(localUser)
-                viewModel.subscribe()
                 onNavigateToChat()
             },
             isReady = isReady
