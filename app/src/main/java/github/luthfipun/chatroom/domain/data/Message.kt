@@ -1,6 +1,7 @@
 package github.luthfipun.chatroom.domain.data
 
 import github.luthfipun.chatroom.domain.util.MessageInfoType
+import github.luthfipun.chatroom.domain.util.MessageStatus
 import github.luthfipun.chatroom.domain.util.MessageType
 
 data class Message(
@@ -11,5 +12,6 @@ data class Message(
     val user: UserInfo,
     val infoType: MessageInfoType?,
     val isOwner: Boolean = false,
-    val isParent: Boolean = true
+    val isParent: Boolean = true,
+    val status: MessageStatus = MessageStatus.WAITING
 )

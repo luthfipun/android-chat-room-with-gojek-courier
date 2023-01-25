@@ -3,10 +3,7 @@ package github.luthfipun.chatroom.domain.model
 import android.content.Context
 import github.luthfipun.chatroom.domain.data.Message
 import github.luthfipun.chatroom.domain.data.UserInfo
-import github.luthfipun.chatroom.domain.util.MessageInfoType
-import github.luthfipun.chatroom.domain.util.MessageType
-import github.luthfipun.chatroom.domain.util.formatMessageInfo
-import github.luthfipun.chatroom.domain.util.formatMessageTime
+import github.luthfipun.chatroom.domain.util.*
 
 data class MessageData(
     val id: Long = System.currentTimeMillis(),
@@ -27,5 +24,6 @@ fun MessageData.toMessage(context: Context): Message {
         infoType = this.infoType,
         isOwner = false,
         isParent = false,
+        status = MessageStatus.SEND
     )
 }

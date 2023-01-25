@@ -1,5 +1,6 @@
 package github.luthfipun.chatroom.presenter.screen
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,14 +8,13 @@ import github.luthfipun.chatroom.R
 import github.luthfipun.chatroom.domain.data.Message
 import github.luthfipun.chatroom.domain.data.UserInfo
 import github.luthfipun.chatroom.domain.model.MessageData
+import github.luthfipun.chatroom.domain.model.toMessage
 import github.luthfipun.chatroom.domain.util.MessageInfoType
+import github.luthfipun.chatroom.domain.util.MessageStatus
 import github.luthfipun.chatroom.domain.util.MessageType
 import github.luthfipun.chatroom.domain.util.messageBodyType
 import github.luthfipun.chatroom.repository.MainRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,7 +32,7 @@ class MainViewModel @Inject constructor(
     val localUser = _localUser.asStateFlow()
 
     private val _localMessage = MutableStateFlow<List<Message>>(emptyList())
-    val localMessage = _localMessage.asStateFlow()
+    val localMessage = _localMessage.map { messageBodyType(it) }
 
     private val avatars = listOf(
         R.drawable.person1,
@@ -54,24 +54,38 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun subscribe() {
+    private fun subscribe() {
         viewModelScope.launch {
             mainRepository.subscribe()
                 .onEach { message ->
                     val updateMessage = message.copy(isOwner = message.user.id == localUser.value?.id)
-                    val updateMessages = messageBodyType(localMessage.value.plus(updateMessage))
-                    _localMessage.emit(updateMessages)
+                    if (message.type == MessageType.TEXT && message.user.id == localUser.value?.id){
+                        _localMessage.update {
+                            it.map { msg ->
+                                if (msg.id == message.id){
+                                    updateMessage
+                                }else {
+                                    msg
+                                }
+                            }
+                        }
+                    }else {
+                        _localMessage.update { it.plus(updateMessage) }
+                    }
                 }
                 .launchIn(viewModelScope)
         }
     }
 
-    fun sendMessage(message: String){
+    fun sendMessage(context: Context, message: String){
         val messageData = MessageData(
             text = message,
             user = localUser.value!!,
             infoType = null
         )
+        val currentMessage = messageData.toMessage(context = context)
+            .copy(status = MessageStatus.WAITING, isOwner = messageData.user.id == localUser.value?.id)
+        _localMessage.update { it.plus(currentMessage) }
         viewModelScope.launch {
             mainRepository.publish(message = messageData)
         }

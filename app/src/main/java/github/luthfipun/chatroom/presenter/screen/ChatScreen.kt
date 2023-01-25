@@ -4,6 +4,7 @@ package github.luthfipun.chatroom.presenter.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import github.luthfipun.chatroom.R
 import github.luthfipun.chatroom.domain.data.Message
 import github.luthfipun.chatroom.domain.util.MessageInfoType
+import github.luthfipun.chatroom.domain.util.MessageStatus
 import github.luthfipun.chatroom.domain.util.MessageType
 import github.luthfipun.chatroom.presenter.screen.ui.theme.Green200
 import github.luthfipun.chatroom.presenter.screen.ui.theme.Green500
@@ -43,7 +46,8 @@ fun ChatScreen(
 ){
     var leaveDialogStatus by remember { mutableStateOf(false) }
     var messageInput by remember { mutableStateOf("") }
-    val messages = viewModel.localMessage.collectAsState()
+    val messages = viewModel.localMessage.collectAsState(initial = emptyList())
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = Unit){
         viewModel.joinOrLeaveRoom(MessageInfoType.JOIN)
@@ -70,7 +74,7 @@ fun ChatScreen(
                 },
                 onSend = {
                     if (messageInput.isNotBlank()){
-                        viewModel.sendMessage(messageInput)
+                        viewModel.sendMessage(context, messageInput)
                         messageInput = ""
                     }
                 }
@@ -150,7 +154,7 @@ fun ChatInput(
         onValueChange = { onMessageChange(it) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = {
             focusManager.clearFocus(true)
@@ -310,6 +314,11 @@ fun ChatMessage(
     var timeVisible by remember { mutableStateOf(message.isParent) }
     val density = LocalDensity.current
 
+    val msgColor by animateColorAsState(
+        targetValue = if (message.status == MessageStatus.SEND) Green500 else Green500.copy(0.3f),
+        animationSpec = tween(durationMillis = 500)
+    )
+
     Column(
         modifier = Modifier.padding(
             start = if (message.isOwner) 0.dp else 8.dp,
@@ -326,7 +335,7 @@ fun ChatMessage(
             modifier = Modifier
                 .widthIn(max = 250.dp)
                 .clickable {
-                    if (!message.isParent){
+                    if (!message.isParent) {
                         timeVisible = !timeVisible
                     }
                 }
@@ -338,7 +347,7 @@ fun ChatMessage(
                         bottomStart = 8.dp
                     )
                 )
-                .background(if (message.isOwner) Green500 else Color.Gray)
+                .background(if (message.isOwner) msgColor else Color.Gray)
                 .padding(16.dp)
                 .align(if (message.isOwner) Alignment.End else Alignment.Start)
         )
@@ -397,7 +406,7 @@ fun LeaveDialog(
             },
             text = {
                 Text(
-                    text = "Are you sure to leave the chat room?",
+                    text = "Are you sure to leave the chat room? The history message will be cleared.",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.Gray
@@ -433,7 +442,7 @@ fun LeaveDialog(
                         )
                     ) {
                         Text(
-                            text = "Yes, Leave Room",
+                            text = "Sure",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.Black
