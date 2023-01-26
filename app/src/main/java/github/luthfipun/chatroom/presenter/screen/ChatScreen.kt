@@ -35,8 +35,9 @@ import github.luthfipun.chatroom.domain.data.Message
 import github.luthfipun.chatroom.domain.util.MessageInfoType
 import github.luthfipun.chatroom.domain.util.MessageStatus
 import github.luthfipun.chatroom.domain.util.MessageType
-import github.luthfipun.chatroom.presenter.screen.ui.theme.Green200
-import github.luthfipun.chatroom.presenter.screen.ui.theme.Green500
+import github.luthfipun.chatroom.presenter.MainViewModel
+import github.luthfipun.chatroom.presenter.ui.theme.Green200
+import github.luthfipun.chatroom.presenter.ui.theme.Green500
 
 @Composable
 fun ChatScreen(

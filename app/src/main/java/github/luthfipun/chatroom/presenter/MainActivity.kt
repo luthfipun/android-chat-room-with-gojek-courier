@@ -1,4 +1,4 @@
-package github.luthfipun.chatroom.presenter.screen
+package github.luthfipun.chatroom.presenter
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,7 +12,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import github.luthfipun.chatroom.presenter.screen.ui.theme.ChatRoomTheme
+import github.luthfipun.chatroom.presenter.screen.ChatScreen
+import github.luthfipun.chatroom.presenter.screen.HomeScreen
+import github.luthfipun.chatroom.presenter.screen.InputScreen
+import github.luthfipun.chatroom.presenter.ui.theme.ChatRoomTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

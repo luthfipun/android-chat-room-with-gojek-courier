@@ -32,8 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import github.luthfipun.chatroom.R
 import github.luthfipun.chatroom.domain.data.UserInfo
-import github.luthfipun.chatroom.presenter.screen.ui.theme.Green200
-import github.luthfipun.chatroom.presenter.screen.ui.theme.Green500
+import github.luthfipun.chatroom.presenter.MainViewModel
+import github.luthfipun.chatroom.presenter.ui.theme.Green200
+import github.luthfipun.chatroom.presenter.ui.theme.Green500
 
 @Composable
 fun InputScreen(

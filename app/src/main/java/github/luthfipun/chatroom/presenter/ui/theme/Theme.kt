@@ -1,4 +1,4 @@
-package github.luthfipun.chatroom.presenter.screen.ui.theme
+package github.luthfipun.chatroom.presenter.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

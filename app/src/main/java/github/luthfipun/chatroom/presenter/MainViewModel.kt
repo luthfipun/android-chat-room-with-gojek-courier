@@ -1,4 +1,4 @@
-package github.luthfipun.chatroom.presenter.screen
+package github.luthfipun.chatroom.presenter
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
