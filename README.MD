@@ -7,6 +7,6 @@ The application stack using MVVM Design Pattern + Hilt Dependency Injection + Je
 
 <hr />
 
-<img src="./ss/ss2.png" width="30%" />
-<img src="./ss/ss3.png" width="30%" />
-<img src="./ss/ss1.png" width="30%" />
+<img src="./ss/ss2.png" width="20%" />
+<img src="./ss/ss3.png" width="20%" />
+<img src="./ss/ss1.png" width="20%" />
