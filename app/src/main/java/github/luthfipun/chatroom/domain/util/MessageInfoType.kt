@@ -1,5 +1,5 @@
 package github.luthfipun.chatroom.domain.util
 
 enum class MessageInfoType {
-    JOIN, LEAVE
+    JOIN, LEAVE, TYPING, UN_TYPING
 }

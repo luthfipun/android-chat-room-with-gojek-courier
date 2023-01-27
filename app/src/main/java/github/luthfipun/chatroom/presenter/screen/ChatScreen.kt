@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -49,9 +50,10 @@ fun ChatScreen(
     var messageInput by remember { mutableStateOf("") }
     val messages = viewModel.localMessage.collectAsState(initial = emptyList())
     val context = LocalContext.current
+    val connectionMessage = viewModel.connectionStatus.collectAsState()
 
     LaunchedEffect(key1 = Unit){
-        viewModel.joinOrLeaveRoom(MessageInfoType.JOIN)
+        viewModel.joinLeaveTypingRoom(MessageInfoType.JOIN)
     }
 
     BackHandler {
@@ -63,7 +65,10 @@ fun ChatScreen(
     ){
         Column(modifier = Modifier
             .fillMaxWidth()) {
-            ChatHeader(onBack = { leaveDialogStatus = true })
+            ChatHeader(
+                onBack = { leaveDialogStatus = true },
+                connectionMsg = connectionMessage.value
+            )
             ChatContent(
                 modifier = Modifier.weight(1f),
                 messages = messages.value.reversed()
@@ -78,13 +83,16 @@ fun ChatScreen(
                         viewModel.sendMessage(context, messageInput)
                         messageInput = ""
                     }
+                },
+                onInputFocused = {
+                    viewModel.joinLeaveTypingRoom(if (it) MessageInfoType.TYPING else MessageInfoType.UN_TYPING)
                 }
             )
         }
         LeaveDialog(
             leaveDialogStatus = leaveDialogStatus,
             onLeaveDialogConfirm = {
-                viewModel.joinOrLeaveRoom(MessageInfoType.LEAVE)
+                viewModel.joinLeaveTypingRoom(MessageInfoType.LEAVE)
                 leaveDialogStatus = false
                 onNavigateBack()
             },
@@ -97,7 +105,8 @@ fun ChatScreen(
 
 @Composable
 fun ChatHeader(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    connectionMsg: String
 ) {
     TopAppBar(
         title = {
@@ -109,7 +118,7 @@ fun ChatHeader(
                     color = MaterialTheme.colors.onPrimary
                 )
                 Text(
-                    text = "someone typing...",
+                    text = connectionMsg,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.LightGray
@@ -145,7 +154,8 @@ fun ChatHeader(
 fun ChatInput(
     messageInput: String,
     onMessageChange: (value: String) -> Unit,
-    onSend: () -> Unit
+    onSend: () -> Unit,
+    onInputFocused: (isFocused: Boolean) -> Unit
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -155,7 +165,8 @@ fun ChatInput(
         onValueChange = { onMessageChange(it) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+            .onFocusChanged { onInputFocused(it.isFocused) },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = {
             focusManager.clearFocus(true)

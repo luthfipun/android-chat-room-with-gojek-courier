@@ -1,6 +1,7 @@
 package github.luthfipun.chatroom.presenter
 
 import android.content.Context
+import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +35,11 @@ class MainViewModel @Inject constructor(
     private val _localMessage = MutableStateFlow<List<Message>>(emptyList())
     val localMessage = _localMessage.map { messageBodyType(it) }
 
+    private val _connectionStatus = MutableStateFlow("Connected")
+    val connectionStatus = _connectionStatus.asStateFlow()
+
+    private var _typingTimer: CountDownTimer? = null
+
     private val avatars = listOf(
         R.drawable.person1,
         R.drawable.person2,
@@ -58,22 +64,42 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             mainRepository.subscribe()
                 .onEach { message ->
-                    val updateMessage = message.copy(isOwner = message.user.id == localUser.value?.id)
-                    if (message.type == MessageType.TEXT && message.user.id == localUser.value?.id){
-                        _localMessage.update {
-                            it.map { msg ->
-                                if (msg.id == message.id){
-                                    updateMessage
-                                }else {
-                                    msg
-                                }
-                            }
-                        }
-                    }else {
-                        _localMessage.update { it.plus(updateMessage) }
+                    if (_typingTimer != null) _typingTimer?.cancel()
+                    when (message.infoType){
+                        MessageInfoType.JOIN -> commitMessage(message)
+                        MessageInfoType.LEAVE -> commitMessage(message)
+                        MessageInfoType.TYPING -> setTypingStatus(message)
+                        MessageInfoType.UN_TYPING -> setTypingStatus(message)
+                        null -> commitMessage(message)
                     }
                 }
                 .launchIn(viewModelScope)
+        }
+    }
+
+    private fun commitMessage(message: Message){
+        val updateMessage = message.copy(isOwner = message.user.id == localUser.value?.id)
+        if (message.type == MessageType.TEXT && message.user.id == localUser.value?.id){
+            _localMessage.update {
+                it.map { msg ->
+                    if (msg.id == message.id){
+                        updateMessage
+                    }else {
+                        msg
+                    }
+                }
+            }
+        }else {
+            _localMessage.update { it.plus(updateMessage) }
+        }
+    }
+
+    private fun setTypingStatus(message: Message){
+        viewModelScope.launch {
+            if (message.infoType == MessageInfoType.TYPING && message.user.id != localUser.value?.id){
+                _connectionStatus.emit("${message.user.name} is typing...")
+                typingCountDown()
+            }
         }
     }
 
@@ -91,18 +117,21 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun joinOrLeaveRoom(messageInfoType: MessageInfoType){
-        val messageData = MessageData(
-            user = localUser.value!!,
-            type = MessageType.INFO,
-            infoType = messageInfoType
-        )
-        viewModelScope.launch {
-            mainRepository.publish(message = messageData)
+    fun joinLeaveTypingRoom(messageInfoType: MessageInfoType){
+        localUser.value?.let {
+            val messageData = MessageData(
+                user = it,
+                type = MessageType.INFO,
+                infoType = messageInfoType
+            )
+            viewModelScope.launch {
+                mainRepository.publish(message = messageData)
+            }
         }
     }
 
     fun clearState(){
+        if (_typingTimer != null) _typingTimer?.cancel()
         viewModelScope.launch {
             _localMessage.emit(emptyList())
             _localUser.emit(null)
@@ -113,5 +142,31 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             mainRepository.connect()
         }
+    }
+
+    private fun unsubscribeAndDisconnect(){
+        viewModelScope.launch {
+            mainRepository.unsubscribe()
+            mainRepository.disconnect()
+        }
+    }
+
+    private fun typingCountDown(){
+        _typingTimer = object : CountDownTimer(5_000L, 1_000){
+            override fun onTick(p0: Long) {}
+
+            override fun onFinish() {
+                viewModelScope.launch {
+                    _connectionStatus.emit("Connected")
+                }
+            }
+        }
+        _typingTimer?.start()
+    }
+
+    override fun onCleared() {
+        if (_typingTimer != null) _typingTimer?.cancel()
+        unsubscribeAndDisconnect()
+        super.onCleared()
     }
 }
